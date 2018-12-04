@@ -40,9 +40,9 @@ singleHexagonGreedySearch = (problem, hexagon) => {
   return null;
 };
 
-const HEXSIZE = 25;
-const h = HEXSIZE * Math.sqrt(3);
-const w = HEXSIZE * 2;
+let HEXSIZE = 25;
+let h = HEXSIZE * Math.sqrt(3);
+let w = HEXSIZE * 2;
 let mapsize = 5;
 let timeInterval = 5000;
 let start = false;
@@ -86,6 +86,15 @@ function draw() {
     fill(0, 255, 0);
     rect(30, 40, ((time - millis()) / timeInterval) * 500, 20);
     pop();
+    if (
+      (mapsize - 1) * h > height / 2 ||
+      (mapsize - 1) * (3 / 4) * w > width / 2
+    ) {
+      console.log("SHRINK");
+      HEXSIZE = HEXSIZE * 0.9;
+      h = HEXSIZE * Math.sqrt(3);
+      w = HEXSIZE * 2;
+    }
     push();
     let center = createVector(width / 2, height / 2);
     translate(center.x, center.y);
@@ -268,13 +277,14 @@ generateRandomHex = n => {
 };
 
 startGame = () => {
-  console.log(mapsize);
   start = true;
   mapsize = 2;
   player.cords = createVector(0, 0, 0);
   timeInterval = 1000 / (difficultySlider.value() / 10);
   time = millis() + timeInterval;
-  console.log(timeInterval);
+  HEXSIZE = 25;
+  h = HEXSIZE * Math.sqrt(3);
+  w = HEXSIZE * 2;
   refreshMap();
 };
 
