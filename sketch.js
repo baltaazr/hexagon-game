@@ -52,10 +52,6 @@ let enemies = null;
 let finish = null;
 let time = 0;
 
-function preload() {
-  //light = imageLoad("img/light.png")
-}
-
 function setup() {
   createCanvas(windowWidth, windowHeight - 4);
   imageMode(CENTER);
@@ -154,6 +150,27 @@ function draw() {
     startButton.show();
     difficultySlider.show();
     text("DIFFICULTY", 0, 100);
+    text(
+      "1. You're the black hexagon, you must reach the green hexagon without touching the red ones",
+      0,
+      115
+    );
+    text(
+      "2. You move with QWE and ASD, Q and E move diagonally up, A and D move diagonally down, and W and S move up and down respectively",
+      0,
+      130
+    );
+    text(
+      "3. Everytime the bar runs out, the red hexagons move one step towards you, watch out!",
+      0,
+      145
+    );
+    text(
+      "4. Sometimes the red hexagons cover the green one, you must wait for them to move for them to reveal the green hexagon, it's called strategy!",
+      0,
+      160
+    );
+    text("5. Have fun!", 0, 175);
   }
 }
 
@@ -182,16 +199,6 @@ oddr_to_absolutecords = hex => {
   }
   return createVector(col, row);
 };
-
-function drawGradient(x, y) {
-  var radius = dim / 2;
-  var h = random(0, 360);
-  for (var r = radius; r > 0; --r) {
-    fill(h, 90, 90);
-    ellipse(x, y, r, r);
-    h = (h + 1) % 360;
-  }
-}
 
 function keyTyped() {
   let newCords = createVector(player.cords.x, player.cords.y, player.cords.z);
