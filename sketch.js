@@ -96,12 +96,38 @@ function draw() {
     }
     if (millis() > time) {
       console.log("MOVE");
-      time = millis() + timeInterval;
+      for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
+        let enemy = enemies[enemyIndex];
+        let enemyCords = oddr_to_absolutecords(
+          cube_to_oddq(
+            createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z)
+          )
+        );
+        polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
+      }
+      push();
+      fill(0, 255, 0);
+      let finishCords = oddr_to_absolutecords(
+        cube_to_oddq(
+          createVector(finish.cords.x, finish.cords.y, finish.cords.z)
+        )
+      );
+      polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
+      pop();
       for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
         let enemy = enemies[enemyIndex];
         enemy.cords = singleHexagonGreedySearch(player, enemy).cords;
+        push();
+        fill(255, 0, 0);
+        let enemyCords = oddr_to_absolutecords(
+          cube_to_oddq(
+            createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z)
+          )
+        );
+        polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
+        pop();
       }
-      drawMap();
+      time = millis() + timeInterval;
     }
     for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
       let enemy = enemies[enemyIndex];
