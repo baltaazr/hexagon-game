@@ -273,8 +273,6 @@ startGame = () => {
   start = true;
   mapsize = 2;
   player.cords = createVector(0, 0, 0);
-  timeInterval = 1000 / (difficultySlider.value() / 10);
-  time = millis() + timeInterval;
   HEXSIZE = 25;
   h = HEXSIZE * Math.sqrt(3);
   w = HEXSIZE * 2;
@@ -284,12 +282,13 @@ startGame = () => {
   translate(center.x, center.y);
   drawMap();
   pop();
+  timeInterval = 1000 / (difficultySlider.value() / 10);
+  time = millis() + timeInterval;
 };
 
 levelUp = () => {
   pop();
   mapsize += 1;
-  time = millis() + timeInterval;
   player.cords = createVector(0, 0, 0);
   refreshMap();
   push();
@@ -297,6 +296,7 @@ levelUp = () => {
   translate(center.x, center.y);
   drawMap();
   pop();
+  time = millis() + timeInterval;
 };
 
 refreshMap = () => {
