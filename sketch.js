@@ -94,30 +94,6 @@ function draw() {
       w = HEXSIZE * 2;
       drawMap();
     }
-    push();
-    fill(0, 255, 0);
-    let finishCords = oddr_to_absolutecords(
-      cube_to_oddq(createVector(finish.cords.x, finish.cords.y, finish.cords.z))
-    );
-    polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
-    pop();
-    push();
-    fill(255, 0, 0);
-    for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
-      const enemy = enemies[enemyIndex];
-      let cords = oddr_to_absolutecords(
-        cube_to_oddq(createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z))
-      );
-      polygon(cords.x, cords.y, HEXSIZE, 6);
-    }
-    pop();
-    push();
-    fill(0);
-    let playerCords = oddr_to_absolutecords(
-      cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
-    );
-    polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
-    pop();
     if (millis() > time) {
       console.log("MOVE");
       time = millis() + timeInterval;
@@ -337,4 +313,28 @@ drawMap = () => {
     );
     polygon(cords.x, cords.y, HEXSIZE, 6);
   }
+  push();
+  fill(0, 255, 0);
+  let finishCords = oddr_to_absolutecords(
+    cube_to_oddq(createVector(finish.cords.x, finish.cords.y, finish.cords.z))
+  );
+  polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
+  pop();
+  push();
+  fill(255, 0, 0);
+  for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
+    const enemy = enemies[enemyIndex];
+    let cords = oddr_to_absolutecords(
+      cube_to_oddq(createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z))
+    );
+    polygon(cords.x, cords.y, HEXSIZE, 6);
+  }
+  pop();
+  push();
+  fill(0);
+  let playerCords = oddr_to_absolutecords(
+    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  );
+  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
+  pop();
 };
