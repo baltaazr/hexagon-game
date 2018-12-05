@@ -126,19 +126,17 @@ function draw() {
         );
         polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
         pop();
+        if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
+          if (confirm("GAME OVER! Want to play again?")) {
+            startGame();
+          } else {
+            start = false;
+          }
+        }
       }
       time = millis() + timeInterval;
     }
-    for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
-      let enemy = enemies[enemyIndex];
-      if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
-        if (confirm("GAME OVER! Want to play again?")) {
-          startGame();
-        } else {
-          start = false;
-        }
-      }
-    }
+    
     pop();
   } else {
     startButton.show();
@@ -235,6 +233,18 @@ function keyTyped() {
     if (p5.Vector.dist(player.cords, finish.cords) === 0) {
       levelUp();
       return;
+    }
+    for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
+      let enemy = enemies[enemyIndex];
+      if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
+        if (confirm("GAME OVER! Want to play again?")) {
+          startGame();
+          return
+        } else {
+          start = false;
+          return
+        }
+      }
     }
   }
   push();
