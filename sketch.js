@@ -170,6 +170,13 @@ oddr_to_absolutecords = hex => {
 };
 
 function keyTyped() {
+  push();
+  let center = createVector(width / 2, height / 2);
+  translate(center.x, center.y);
+  let playerCords = oddr_to_absolutecords(
+    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  );
+  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
   let newCords = createVector(player.cords.x, player.cords.y, player.cords.z);
   if (key === "q") {
     newCords.x -= 1;
@@ -199,15 +206,19 @@ function keyTyped() {
     newCords.z > -mapsize
   ) {
     player.cords = newCords;
-    push();
-    let center = createVector(width / 2, height / 2);
-    translate(center.x, center.y);
-    drawMap();
-    pop();
     if (p5.Vector.dist(player.cords, finish.cords) === 0) {
       levelUp();
+      return;
     }
   }
+  push();
+  fill(0);
+  playerCords = oddr_to_absolutecords(
+    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  );
+  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
+  pop();
+  pop();
 }
 
 generateEnemies = n => {
@@ -276,6 +287,7 @@ startGame = () => {
 };
 
 levelUp = () => {
+  pop();
   mapsize += 1;
   time = millis() + timeInterval;
   player.cords = createVector(0, 0, 0);
@@ -321,6 +333,13 @@ drawMap = () => {
   polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
   pop();
   push();
+  fill(0);
+  let playerCords = oddr_to_absolutecords(
+    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  );
+  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
+  pop();
+  push();
   fill(255, 0, 0);
   for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
     const enemy = enemies[enemyIndex];
@@ -329,12 +348,5 @@ drawMap = () => {
     );
     polygon(cords.x, cords.y, HEXSIZE, 6);
   }
-  pop();
-  push();
-  fill(0);
-  let playerCords = oddr_to_absolutecords(
-    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
-  );
-  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
   pop();
 };
