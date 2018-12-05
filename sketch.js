@@ -71,7 +71,11 @@ function draw() {
     push();
     fill(0);
     textSize(32);
-    text("Level " + (mapsize - 1), 0, 32);
+    text(
+      "Level " + (mapsize - 1) + ", Difficulty " + difficultySlider.value(),
+      0,
+      32
+    );
     pop();
     push();
     fill(255, 0, 0);
@@ -136,7 +140,7 @@ function draw() {
       }
       time = millis() + timeInterval;
     }
-    
+
     pop();
   } else {
     startButton.show();
@@ -239,10 +243,10 @@ function keyTyped() {
       if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
         if (confirm("GAME OVER! Want to play again?")) {
           startGame();
-          return
+          return;
         } else {
           start = false;
-          return
+          return;
         }
       }
     }
