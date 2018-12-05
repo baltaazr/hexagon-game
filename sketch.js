@@ -65,7 +65,6 @@ function setup() {
 }
 
 function draw() {
-  background(255);
   if (start) {
     startButton.hide();
     difficultySlider.hide();
@@ -82,6 +81,9 @@ function draw() {
     fill(0, 255, 0);
     rect(30, 40, ((time - millis()) / timeInterval) * 500, 20);
     pop();
+    push();
+    let center = createVector(width / 2, height / 2);
+    translate(center.x, center.y);
     if (
       (mapsize - 1) * h > height / 2 ||
       (mapsize - 1) * (3 / 4) * w > width / 2
@@ -90,20 +92,8 @@ function draw() {
       HEXSIZE = HEXSIZE * 0.9;
       h = HEXSIZE * Math.sqrt(3);
       w = HEXSIZE * 2;
+      drawMap();
     }
-    push();
-    let center = createVector(width / 2, height / 2);
-    translate(center.x, center.y);
-    for (let n = 0; n < map.length; n++) {
-      const mapHex = map[n];
-      let cords = oddr_to_absolutecords(
-        cube_to_oddq(
-          createVector(mapHex.cords.x, mapHex.cords.y, mapHex.cords.z)
-        )
-      );
-      polygon(cords.x, cords.y, HEXSIZE, 6);
-    }
-    push();
     push();
     fill(0, 255, 0);
     let finishCords = oddr_to_absolutecords(
@@ -111,6 +101,7 @@ function draw() {
     );
     polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
     pop();
+    push();
     fill(255, 0, 0);
     for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
       const enemy = enemies[enemyIndex];
@@ -133,6 +124,7 @@ function draw() {
       for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
         let enemy = enemies[enemyIndex];
         enemy.cords = singleHexagonGreedySearch(player, enemy).cords;
+        drawMap();
       }
     }
     for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
@@ -149,6 +141,7 @@ function draw() {
   } else {
     startButton.show();
     difficultySlider.show();
+    background(255);
     text("DIFFICULTY", 0, 100);
     text(
       "1. You're the black hexagon, you must reach the green hexagon without touching the red ones",
@@ -230,6 +223,11 @@ function keyTyped() {
     newCords.z > -mapsize
   ) {
     player.cords = newCords;
+    push();
+    let center = createVector(width / 2, height / 2);
+    translate(center.x, center.y);
+    drawMap();
+    pop();
     if (p5.Vector.dist(player.cords, finish.cords) === 0) {
       levelUp();
     }
@@ -284,6 +282,7 @@ generateRandomHex = n => {
 };
 
 startGame = () => {
+  pop();
   start = true;
   mapsize = 2;
   player.cords = createVector(0, 0, 0);
@@ -293,6 +292,11 @@ startGame = () => {
   h = HEXSIZE * Math.sqrt(3);
   w = HEXSIZE * 2;
   refreshMap();
+  push();
+  let center = createVector(width / 2, height / 2);
+  translate(center.x, center.y);
+  drawMap();
+  pop();
 };
 
 levelUp = () => {
@@ -300,6 +304,11 @@ levelUp = () => {
   time = millis() + timeInterval;
   player.cords = createVector(0, 0, 0);
   refreshMap();
+  push();
+  let center = createVector(width / 2, height / 2);
+  translate(center.x, center.y);
+  drawMap();
+  pop();
 };
 
 refreshMap = () => {
@@ -317,4 +326,15 @@ refreshMap = () => {
   }
   enemies = generateEnemies(mapsize - 1);
   finish = { cords: generateRandomHex(mapsize - 1) };
+};
+
+drawMap = () => {
+  background(255);
+  for (let n = 0; n < map.length; n++) {
+    const mapHex = map[n];
+    let cords = oddr_to_absolutecords(
+      cube_to_oddq(createVector(mapHex.cords.x, mapHex.cords.y, mapHex.cords.z))
+    );
+    polygon(cords.x, cords.y, HEXSIZE, 6);
+  }
 };
