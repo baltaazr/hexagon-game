@@ -100,8 +100,8 @@ function draw() {
       for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
         let enemy = enemies[enemyIndex];
         enemy.cords = singleHexagonGreedySearch(player, enemy).cords;
-        drawMap();
       }
+      drawMap();
     }
     for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
       let enemy = enemies[enemyIndex];
