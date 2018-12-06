@@ -163,7 +163,7 @@ function draw() {
       145
     );
     text(
-      "4. Sometimes the red hexagons cover the green one, you must wait for them to move for them to reveal the green hexagon, it's called strategy!",
+      "4. Sometimes the red hexagons cover the green one, you must wait for them to move for you to get on the green hexagon, it's called strategy!",
       0,
       160
     );
