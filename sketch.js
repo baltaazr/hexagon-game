@@ -234,10 +234,6 @@ function keyTyped() {
     newCords.z > -mapsize
   ) {
     player.cords = newCords;
-    if (p5.Vector.dist(player.cords, finish.cords) === 0) {
-      levelUp();
-      return;
-    }
     for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
       let enemy = enemies[enemyIndex];
       if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
@@ -249,6 +245,10 @@ function keyTyped() {
           return;
         }
       }
+    }
+    if (p5.Vector.dist(player.cords, finish.cords) === 0) {
+      levelUp();
+      return;
     }
   }
   push();
