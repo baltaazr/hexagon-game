@@ -353,7 +353,16 @@ refreshMap = () => {
     }
   }
   enemies = generateEnemies(mapsize - 1);
-  finish = { cords: generateRandomHex(mapsize - 1) };
+  finishInRed = true;
+  while (finishInRed) {
+    finish = { cords: generateRandomHex(mapsize - 1) };
+    finishInRed = false;
+    enemies.forEach(enemies => {
+      if (p5.Vector.dist(enemies.cords, finish.cords) === 0) {
+        finishInRed = true;
+      }
+    });
+  }
 };
 
 drawMap = () => {
