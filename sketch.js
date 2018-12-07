@@ -51,6 +51,21 @@ let player = null;
 let enemies = null;
 let finish = null;
 let time = 0;
+let firstPlace = {
+  name: "LOADING",
+  level: 0,
+  difficulty: 0
+};
+let secondPlace = {
+  name: "LOADING",
+  level: 0,
+  difficulty: 0
+};
+let thirdPlace = {
+  name: "LOADING",
+  level: 0,
+  difficulty: 0
+};
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4);
@@ -131,11 +146,7 @@ function draw() {
         polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
         pop();
         if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
-          if (confirm("GAME OVER! Want to play again?")) {
-            startGame();
-          } else {
-            start = false;
-          }
+          gameOver();
         }
       }
       time = millis() + timeInterval;
@@ -143,6 +154,15 @@ function draw() {
 
     pop();
   } else {
+    firebase
+      .database()
+      .ref()
+      .child("leaderboard")
+      .on("value", leaderboard => {
+        firstPlace = leaderboard.val().first;
+        secondPlace = leaderboard.val().second;
+        thirdPlace = leaderboard.val().third;
+      });
     startButton.show();
     difficultySlider.show();
     background(255);
@@ -168,6 +188,38 @@ function draw() {
       160
     );
     text("5. Have fun!", 0, 175);
+
+    text("LEADERBOARD, THE BEST OF THE BEST!", 0, 200);
+    text(
+      "1. " +
+        firstPlace.name +
+        ", Level: " +
+        firstPlace.level +
+        ", Difficulty: " +
+        firstPlace.difficulty,
+      0,
+      215
+    );
+    text(
+      "2. " +
+        secondPlace.name +
+        ", Level: " +
+        secondPlace.level +
+        ", Difficulty: " +
+        secondPlace.difficulty,
+      0,
+      230
+    );
+    text(
+      "3. " +
+        thirdPlace.name +
+        ", Level: " +
+        thirdPlace.level +
+        ", Difficulty: " +
+        thirdPlace.difficulty,
+      0,
+      245
+    );
   }
 }
 
@@ -237,13 +289,8 @@ function keyTyped() {
     for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
       let enemy = enemies[enemyIndex];
       if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
-        if (confirm("GAME OVER! Want to play again?")) {
-          startGame();
-          return;
-        } else {
-          start = false;
-          return;
-        }
+        gameOver();
+        return;
       }
     }
     if (p5.Vector.dist(player.cords, finish.cords) === 0) {
@@ -398,4 +445,49 @@ drawMap = () => {
     polygon(cords.x, cords.y, HEXSIZE, 6);
   }
   pop();
+};
+
+gameOver = () => {
+  let score = (mapsize - 1) * difficultySlider.value();
+  let playerStats = {
+    level: mapsize - 1,
+    difficulty: difficultySlider.value()
+  };
+  if (score > firstPlace.level * firstPlace.difficulty) {
+    playerStats.name = prompt(
+      "You seem to have beaten the #1 record, well done! Want to put your name on the leaderboard?:"
+    );
+    if (playerStats.name && playerStats.name != "") {
+      setPlace(firstPlace, "second");
+      setPlace(secondPlace, "third");
+      setPlace(playerStats, "first");
+    }
+  } else if (score > secondPlace.level * secondPlace.difficulty) {
+    playerStats.name = prompt(
+      "You seem to have beaten the #2 record, well done! Want to put your name on the leaderboard?:"
+    );
+    if (playerStats.name && playerStats.name != "") {
+      setPlace(secondPlace, "third");
+      setPlace(playerStats, "second");
+    }
+  } else if (score > thirdPlace.level * thirdPlace.difficulty) {
+    playerStats.name = prompt(
+      "You seem to have beaten the #3 record, well done! Want to put your name on the leaderboard?:"
+    );
+    if (playerStats.name && playerStats.name != "") {
+      setPlace(playerStats, "third");
+    }
+  }
+  if (confirm("GAME OVER! Want to play again?")) {
+    startGame();
+  } else {
+    start = false;
+  }
+};
+
+setPlace = (playerStats, place) => {
+  firebase
+    .database()
+    .ref("leaderboard/" + place)
+    .set(playerStats);
 };

@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=UA-130548156-1"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "UA-130548156-1");
-    </script>
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -23,6 +9,20 @@
       maximum-scale="1.0,"
       user-scalable="0"
     />
+    <title>The Hexagon Game</title>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCFPN5POMqplY3TV3OmkwzGgTj8SVWI0h0",
+        authDomain: "hexagon-game-333dd.firebaseapp.com",
+        databaseURL: "https://hexagon-game-333dd.firebaseio.com",
+        projectId: "hexagon-game-333dd",
+        storageBucket: "hexagon-game-333dd.appspot.com",
+        messagingSenderId: "339614299582"
+      };
+      firebase.initializeApp(config);
+    </script>
     <style>
       body {
         padding: 0;
