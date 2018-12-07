@@ -220,6 +220,7 @@ function draw() {
       0,
       245
     );
+    text("(Score is difficulty x level)");
   }
 }
 
