@@ -66,6 +66,15 @@ let thirdPlace = {
   level: 0,
   difficulty: 0
 };
+firebase
+  .database()
+  .ref()
+  .child("leaderboard")
+  .on("value", leaderboard => {
+    firstPlace = leaderboard.val().first;
+    secondPlace = leaderboard.val().second;
+    thirdPlace = leaderboard.val().third;
+  });
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4);
@@ -154,15 +163,6 @@ function draw() {
 
     pop();
   } else {
-    firebase
-      .database()
-      .ref()
-      .child("leaderboard")
-      .on("value", leaderboard => {
-        firstPlace = leaderboard.val().first;
-        secondPlace = leaderboard.val().second;
-        thirdPlace = leaderboard.val().third;
-      });
     startButton.show();
     difficultySlider.show();
     background(255);
