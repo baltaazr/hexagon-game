@@ -477,6 +477,7 @@ generateRandomHex = n => {
 
 startGame = () => {
   pop();
+  pop();
   start = true;
   gameOverBoolean = false;
   mapsize = 2;
