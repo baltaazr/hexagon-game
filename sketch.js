@@ -66,6 +66,16 @@ let thirdPlace = {
   level: 0,
   difficulty: 0
 };
+let fourthPlace = {
+  name: "LOADING",
+  level: 0,
+  difficulty: 0
+};
+let fifthPlace = {
+  name: "LOADING",
+  level: 0,
+  difficulty: 0
+};
 firebase
   .database()
   .ref()
@@ -74,7 +84,11 @@ firebase
     firstPlace = leaderboard.val().first;
     secondPlace = leaderboard.val().second;
     thirdPlace = leaderboard.val().third;
+    fourthPlace = leaderboard.val().fourth;
+    fifthPlace = leaderboard.val().fifth;
   });
+let hexagonMode = "flat";
+let gameOverBoolean = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4);
@@ -86,12 +100,27 @@ function setup() {
   startButton.mouseClicked(startGame);
   difficultySlider = createSlider(1, 10, 2);
   difficultySlider.position(0, 64);
+  hexagonModeButton = createButton("Change Hexagon Mode");
+  hexagonModeButton.position(70, 32);
+  hexagonModeButton.mouseClicked(() => {
+    if (hexagonMode === "flat") {
+      hexagonMode = "pointy";
+      w = HEXSIZE * Math.sqrt(3);
+      h = HEXSIZE * 2;
+    } else if (hexagonMode === "pointy") {
+      hexagonMode = "flat";
+      h = HEXSIZE * Math.sqrt(3);
+      w = HEXSIZE * 2;
+    }
+    console.log(w, h);
+  });
 }
 
 function draw() {
   if (start) {
     startButton.hide();
     difficultySlider.hide();
+    hexagonModeButton.hide();
     push();
     fill(0);
     textSize(32);
@@ -112,22 +141,35 @@ function draw() {
     push();
     let center = createVector(width / 2, height / 2);
     translate(center.x, center.y);
-    if (
-      (mapsize - 1) * h > height / 2 ||
-      (mapsize - 1) * (3 / 4) * w > width / 2
-    ) {
-      console.log("SHRINK");
-      HEXSIZE = HEXSIZE * 0.9;
-      h = HEXSIZE * Math.sqrt(3);
-      w = HEXSIZE * 2;
-      drawMap();
+    if (hexagonMode === "flat") {
+      if (
+        (mapsize - 1) * h > height / 2 ||
+        (mapsize - 1) * (3 / 4) * w > width / 2
+      ) {
+        console.log("SHRINK");
+        HEXSIZE = HEXSIZE * 0.9;
+        h = HEXSIZE * Math.sqrt(3);
+        w = HEXSIZE * 2;
+        drawMap();
+      }
+    } else if (hexagonMode === "pointy") {
+      if (
+        (mapsize - 1) * (3 / 4) * h > height / 2 ||
+        (mapsize - 1) * w > width / 2
+      ) {
+        console.log("SHRINK");
+        HEXSIZE = HEXSIZE * 0.9;
+        w = HEXSIZE * Math.sqrt(3);
+        h = HEXSIZE * 2;
+        drawMap();
+      }
     }
     if (millis() > time) {
       console.log("MOVE");
       for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
         let enemy = enemies[enemyIndex];
-        let enemyCords = oddr_to_absolutecords(
-          cube_to_oddq(
+        let enemyCords = offset_to_absolute(
+          cube_to_offset(
             createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z)
           )
         );
@@ -135,36 +177,36 @@ function draw() {
       }
       push();
       fill(0, 255, 0);
-      let finishCords = oddr_to_absolutecords(
-        cube_to_oddq(
+      let finishCords = offset_to_absolute(
+        cube_to_offset(
           createVector(finish.cords.x, finish.cords.y, finish.cords.z)
         )
       );
       polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
       pop();
+      push();
+      fill(255, 0, 0);
       for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
         let enemy = enemies[enemyIndex];
         enemy.cords = singleHexagonGreedySearch(player, enemy).cords;
-        push();
-        fill(255, 0, 0);
-        let enemyCords = oddr_to_absolutecords(
-          cube_to_oddq(
+        let enemyCords = offset_to_absolute(
+          cube_to_offset(
             createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z)
           )
         );
         polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
-        pop();
         if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
           gameOver();
         }
       }
+      pop();
       time = millis() + timeInterval;
     }
-
     pop();
   } else {
     startButton.show();
     difficultySlider.show();
+    hexagonModeButton.show();
     background(255);
     text("DIFFICULTY", 0, 100);
     text(
@@ -172,11 +214,19 @@ function draw() {
       0,
       115
     );
-    text(
-      "2. You move with QWE and ASD, Q and E move diagonally up, A and D move diagonally down, and W and S move up and down respectively",
-      0,
-      130
-    );
+    if (hexagonMode === "flat") {
+      text(
+        "2. You move with QE, AD and WS, Q and E move diagonally up, A and D move diagonally down, and W and S move up and down respectively",
+        0,
+        130
+      );
+    } else if (hexagonMode === "pointy") {
+      text(
+        "2. You move with WE, AD AND ZX, W and E move diagonally up, A and D move right and left, and Z and X move diagonally down",
+        0,
+        130
+      );
+    }
     text(
       "3. Everytime the bar runs out, the red hexagons move one step towards you, watch out!",
       0,
@@ -220,63 +270,132 @@ function draw() {
       0,
       245
     );
-    text("(Score is difficulty x level)", 0, 275);
+    text(
+      "4. " +
+        fourthPlace.name +
+        ", Level: " +
+        fourthPlace.level +
+        ", Difficulty: " +
+        fourthPlace.difficulty,
+      0,
+      260
+    );
+    text(
+      "5. " +
+        fifthPlace.name +
+        ", Level: " +
+        fifthPlace.level +
+        ", Difficulty: " +
+        fifthPlace.difficulty,
+      0,
+      275
+    );
+    text("(Score is difficulty x level)", 0, 305);
+    text(hexagonMode, 230, 50);
   }
 }
 
 function polygon(x, y, radius, npoints) {
-  var angle = 360 / npoints;
-  beginShape();
-  for (var a = 0; a < 360; a += angle) {
-    var sx = x + cos(a) * radius;
-    var sy = y + sin(a) * radius;
-    vertex(sx, sy);
+  if (hexagonMode === "flat") {
+    var angle = 360 / npoints;
+    beginShape();
+    for (var a = 0; a < 360; a += angle) {
+      var sx = x + cos(a) * radius;
+      var sy = y + sin(a) * radius;
+      vertex(sx, sy);
+    }
+    endShape(CLOSE);
+  } else if (hexagonMode === "pointy") {
+    var angle = 360 / npoints;
+    beginShape();
+    for (var a = 0; a < 360; a += angle) {
+      var sx = x + sin(a) * radius;
+      var sy = y + cos(a) * radius;
+      vertex(sx, sy);
+    }
+    endShape(CLOSE);
   }
-  endShape(CLOSE);
 }
 
-function cube_to_oddq(cube) {
-  var col = cube.x;
-  var row = cube.z + (cube.x - (cube.x & 1)) / 2;
-  return createVector(col, row);
+function cube_to_offset(cube) {
+  if (hexagonMode === "flat") {
+    var col = cube.x;
+    var row = cube.z + (cube.x - (cube.x & 1)) / 2;
+    return createVector(col, row);
+  } else if (hexagonMode === "pointy") {
+    var col = cube.x + (cube.z - (cube.z & 1)) / 2;
+    var row = cube.z;
+    return createVector(col, row);
+  }
 }
 
-oddr_to_absolutecords = hex => {
-  let row = hex.y * h;
-  let col = hex.x * (3 / 4) * w;
-  if (hex.x % 2 !== 0) {
-    row += (1 / 2) * h;
+offset_to_absolute = hex => {
+  if (hexagonMode === "flat") {
+    let row = hex.y * h;
+    let col = hex.x * (3 / 4) * w;
+    if (hex.x % 2 !== 0) {
+      row += (1 / 2) * h;
+    }
+    return createVector(col, row);
+  } else if (hexagonMode === "pointy") {
+    let col = hex.x * w;
+    let row = hex.y * (3 / 4) * h;
+    if (hex.y % 2 !== 0) {
+      col += (1 / 2) * w;
+    }
+    return createVector(col, row);
   }
-  return createVector(col, row);
 };
 
 function keyTyped() {
   push();
   let center = createVector(width / 2, height / 2);
   translate(center.x, center.y);
-  let playerCords = oddr_to_absolutecords(
-    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  let playerCords = offset_to_absolute(
+    cube_to_offset(createVector(player.cords.x, player.cords.y, player.cords.z))
   );
   polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
   let newCords = createVector(player.cords.x, player.cords.y, player.cords.z);
-  if (key === "q") {
-    newCords.x -= 1;
-    newCords.y += 1;
-  } else if (key === "w") {
-    newCords.z -= 1;
-    newCords.y += 1;
-  } else if (key === "e") {
-    newCords.x += 1;
-    newCords.z -= 1;
-  } else if (key === "a") {
-    newCords.x -= 1;
-    newCords.z += 1;
-  } else if (key === "s") {
-    newCords.z += 1;
-    newCords.y -= 1;
-  } else if (key === "d") {
-    newCords.x += 1;
-    newCords.y -= 1;
+  if (hexagonMode === "flat") {
+    if (key === "q") {
+      newCords.x -= 1;
+      newCords.y += 1;
+    } else if (key === "w") {
+      newCords.z -= 1;
+      newCords.y += 1;
+    } else if (key === "e") {
+      newCords.x += 1;
+      newCords.z -= 1;
+    } else if (key === "a") {
+      newCords.x -= 1;
+      newCords.z += 1;
+    } else if (key === "s") {
+      newCords.z += 1;
+      newCords.y -= 1;
+    } else if (key === "d") {
+      newCords.x += 1;
+      newCords.y -= 1;
+    }
+  } else if (hexagonMode === "pointy") {
+    if (key === "w") {
+      newCords.z -= 1;
+      newCords.y += 1;
+    } else if (key === "e") {
+      newCords.x += 1;
+      newCords.z -= 1;
+    } else if (key === "a") {
+      newCords.x -= 1;
+      newCords.y += 1;
+    } else if (key === "d") {
+      newCords.x += 1;
+      newCords.y -= 1;
+    } else if (key === "z") {
+      newCords.x -= 1;
+      newCords.z += 1;
+    } else if (key === "x") {
+      newCords.z += 1;
+      newCords.y -= 1;
+    }
   }
   if (
     newCords.x < mapsize &&
@@ -301,8 +420,8 @@ function keyTyped() {
   }
   push();
   fill(0);
-  playerCords = oddr_to_absolutecords(
-    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  playerCords = offset_to_absolute(
+    cube_to_offset(createVector(player.cords.x, player.cords.y, player.cords.z))
   );
   polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
   pop();
@@ -359,11 +478,17 @@ generateRandomHex = n => {
 startGame = () => {
   pop();
   start = true;
+  gameOverBoolean = false;
   mapsize = 2;
   player.cords = createVector(0, 0, 0);
   HEXSIZE = 25;
-  h = HEXSIZE * Math.sqrt(3);
-  w = HEXSIZE * 2;
+  if (hexagonMode === "flat") {
+    h = HEXSIZE * Math.sqrt(3);
+    w = HEXSIZE * 2;
+  } else if (hexagonMode === "pointy") {
+    w = HEXSIZE * Math.sqrt(3);
+    h = HEXSIZE * 2;
+  }
   refreshMap();
   push();
   let center = createVector(width / 2, height / 2);
@@ -417,22 +542,24 @@ drawMap = () => {
   background(255);
   for (let n = 0; n < map.length; n++) {
     const mapHex = map[n];
-    let cords = oddr_to_absolutecords(
-      cube_to_oddq(createVector(mapHex.cords.x, mapHex.cords.y, mapHex.cords.z))
+    let cords = offset_to_absolute(
+      cube_to_offset(
+        createVector(mapHex.cords.x, mapHex.cords.y, mapHex.cords.z)
+      )
     );
     polygon(cords.x, cords.y, HEXSIZE, 6);
   }
   push();
   fill(0, 255, 0);
-  let finishCords = oddr_to_absolutecords(
-    cube_to_oddq(createVector(finish.cords.x, finish.cords.y, finish.cords.z))
+  let finishCords = offset_to_absolute(
+    cube_to_offset(createVector(finish.cords.x, finish.cords.y, finish.cords.z))
   );
   polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
   pop();
   push();
   fill(0);
-  let playerCords = oddr_to_absolutecords(
-    cube_to_oddq(createVector(player.cords.x, player.cords.y, player.cords.z))
+  let playerCords = offset_to_absolute(
+    cube_to_offset(createVector(player.cords.x, player.cords.y, player.cords.z))
   );
   polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
   pop();
@@ -440,8 +567,8 @@ drawMap = () => {
   fill(255, 0, 0);
   for (let enemyIndex = 0; enemyIndex < enemies.length; enemyIndex++) {
     const enemy = enemies[enemyIndex];
-    let cords = oddr_to_absolutecords(
-      cube_to_oddq(createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z))
+    let cords = offset_to_absolute(
+      cube_to_offset(createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z))
     );
     polygon(cords.x, cords.y, HEXSIZE, 6);
   }
@@ -449,18 +576,28 @@ drawMap = () => {
 };
 
 gameOver = () => {
+  if (gameOverBoolean) {
+    return null;
+  }
+  gameOverBoolean = true;
   let score = (mapsize - 1) * difficultySlider.value();
   let playerStats = {
     level: mapsize - 1,
     difficulty: difficultySlider.value()
   };
+  let concurrentFirst = { ...firstPlace };
+  let concurrentSecond = { ...secondPlace };
+  let concurrentThird = { ...thirdPlace };
+  let concurrentFourth = { ...fourthPlace };
   if (score > firstPlace.level * firstPlace.difficulty) {
     playerStats.name = prompt(
       "You seem to have beaten the #1 record, well done! Want to put your name on the leaderboard?:"
     );
     if (playerStats.name && playerStats.name != "") {
-      setPlace(firstPlace, "second");
-      setPlace(secondPlace, "third");
+      setPlace(concurrentFirst, "second");
+      setPlace(concurrentSecond, "third");
+      setPlace(concurrentThird, "fourth");
+      setPlace(concurrentFourth, "fifth");
       setPlace(playerStats, "first");
     }
   } else if (score > secondPlace.level * secondPlace.difficulty) {
@@ -468,7 +605,9 @@ gameOver = () => {
       "You seem to have beaten the #2 record, well done! Want to put your name on the leaderboard?:"
     );
     if (playerStats.name && playerStats.name != "") {
-      setPlace(secondPlace, "third");
+      setPlace(concurrentSecond, "third");
+      setPlace(concurrentThird, "fourth");
+      setPlace(concurrentFourth, "fifth");
       setPlace(playerStats, "second");
     }
   } else if (score > thirdPlace.level * thirdPlace.difficulty) {
@@ -476,7 +615,24 @@ gameOver = () => {
       "You seem to have beaten the #3 record, well done! Want to put your name on the leaderboard?:"
     );
     if (playerStats.name && playerStats.name != "") {
+      setPlace(concurrentThird, "fourth");
+      setPlace(concurrentFourth, "fifth");
       setPlace(playerStats, "third");
+    }
+  } else if (score > fourthPlace.level * fourthPlace.difficulty) {
+    playerStats.name = prompt(
+      "You seem to have beaten the #4 record, well done! Want to put your name on the leaderboard?:"
+    );
+    if (playerStats.name && playerStats.name != "") {
+      setPlace(concurrentFourth, "fifth");
+      setPlace(playerStats, "fourth");
+    }
+  } else if (score > fifthPlace.level * fifthPlace.difficulty) {
+    playerStats.name = prompt(
+      "You seem to have beaten the #5 record, well done! Want to put your name on the leaderboard?:"
+    );
+    if (playerStats.name && playerStats.name != "") {
+      setPlace(playerStats, "fifth");
     }
   }
   if (confirm("GAME OVER! Want to play again?")) {
