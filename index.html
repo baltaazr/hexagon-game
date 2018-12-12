@@ -23,6 +23,11 @@
       };
       firebase.initializeApp(config);
     </script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta
+      name="google-signin-client_id"
+      content="339614299582-l75uqn8kspurbbin4iu9neuikvap4d1g.apps.googleusercontent.com"
+    />
     <style>
       body {
         padding: 0;
@@ -44,5 +49,7 @@
     <script src="sketch.js"></script>
   </head>
 
-  <body></body>
+  <body>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+  </body>
 </html>
