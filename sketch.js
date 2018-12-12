@@ -91,12 +91,30 @@ let hexagonMode = "flat";
 let gameOverBoolean = false;
 let hexagonProfile = null;
 let users = null;
+let googleProfile = null;
 firebase
   .database()
   .ref()
   .child("user")
   .on("value", user => {
     users = user.val();
+    if (googleProfile) {
+      if (users[googleProfile.getId()]) {
+        hexagonProfile = users[googleProfile.getId()];
+        hexagonProfile.id = googleProfile.getId();
+      } else {
+        hexagonProfile = {
+          name: googleProfile.getName(),
+          email: googleProfile.getEmail(),
+          highscore: { level: 0, difficulty: 0 }
+        };
+        firebase
+          .database()
+          .ref("user/" + googleProfile.getId())
+          .set(hexagonProfile);
+        hexagonProfile.id = googleProfile.getId();
+      }
+    }
   });
 
 function setup() {
@@ -680,25 +698,26 @@ setPlace = (playerStats, place) => {
 };
 
 function onSignIn(googleUser) {
-  profile = googleUser.getBasicProfile();
+  googleProfile = googleUser.getBasicProfile();
   console.log("ID: " + profile.getId()); // Do not send to your backend! Use an ID token instead.
   console.log("Name: " + profile.getName());
   console.log("Image URL: " + profile.getImageUrl());
   console.log("Email: " + profile.getEmail()); // This is null if the 'email' scope is not present.
-
-  if (users[profile.getId()]) {
-    hexagonProfile = users[profile.getId()];
-    hexagonProfile.id = profile.getId();
-  } else {
-    hexagonProfile = {
-      name: profile.getName(),
-      email: profile.getEmail(),
-      highscore: { level: 0, difficulty: 0 }
-    };
-    firebase
-      .database()
-      .ref("user/" + profile.getId())
-      .set(hexagonProfile);
-    hexagonProfile.id = profile.getId();
+  if (users) {
+    if (users[profile.getId()]) {
+      hexagonProfile = users[profile.getId()];
+      hexagonProfile.id = profile.getId();
+    } else {
+      hexagonProfile = {
+        name: profile.getName(),
+        email: profile.getEmail(),
+        highscore: { level: 0, difficulty: 0 }
+      };
+      firebase
+        .database()
+        .ref("user/" + profile.getId())
+        .set(hexagonProfile);
+      hexagonProfile.id = profile.getId();
+    }
   }
 }
