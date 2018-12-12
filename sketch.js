@@ -656,6 +656,7 @@ gameOver = () => {
         if (scoreA > scoreB) return -1;
         return 0;
       });
+      console.log(leaderBoardArray);
       for (let lbaIndex = 0; lbaIndex < leaderBoardArray.length; lbaIndex++) {
         const firstElement = leaderBoardArray[lbaIndex];
         for (
@@ -669,6 +670,7 @@ gameOver = () => {
           }
         }
       }
+      console.log(leaderBoardArray);
       setPlace = (leaderBoardArray[0], "first");
       setPlace = (leaderBoardArray[1], "second");
       setPlace = (leaderBoardArray[2], "third");
