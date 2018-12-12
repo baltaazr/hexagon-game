@@ -648,34 +648,27 @@ gameOver = () => {
         concurrentFifth,
         playerStats
       ];
-      leaderBoardArray
-        .sort(function(a, b) {
-          let scoreA = a.difficulty * a.level;
-          let scoreB = b.difficulty * b.level;
-          // Compare the 2 dates
-          if (scoreA < scoreB) return 1;
-          if (scoreA > scoreB) return -1;
-          return 0;
-        })
-        .then(val => {
-          for (
-            let lbaIndex = 0;
-            lbaIndex < leaderBoardArray.length;
-            lbaIndex++
-          ) {
-            const firstElement = leaderBoardArray[lbaIndex];
-            for (
-              let lbaInnerIndex = lbaIndex;
-              lbaInnerIndex < leaderBoardArray.length;
-              lbaInnerIndex++
-            ) {
-              const secondElement = leaderBoardArray[lbaInnerIndex];
-              if (firstElement.name === secondElement.name) {
-                leaderBoardArray.splice(lbaInnerIndex, 1);
-              }
-            }
+      leaderBoardArray.sort(function(a, b) {
+        let scoreA = a.difficulty * a.level;
+        let scoreB = b.difficulty * b.level;
+        // Compare the 2 dates
+        if (scoreA < scoreB) return 1;
+        if (scoreA > scoreB) return -1;
+        return 0;
+      });
+      for (let lbaIndex = 0; lbaIndex < leaderBoardArray.length; lbaIndex++) {
+        const firstElement = leaderBoardArray[lbaIndex];
+        for (
+          let lbaInnerIndex = lbaIndex;
+          lbaInnerIndex < leaderBoardArray.length;
+          lbaInnerIndex++
+        ) {
+          const secondElement = leaderBoardArray[lbaInnerIndex];
+          if (firstElement.name === secondElement.name) {
+            leaderBoardArray.splice(lbaInnerIndex, 1);
           }
-        });
+        }
+      }
       setPlace = (leaderBoardArray[0], "first");
       setPlace = (leaderBoardArray[1], "second");
       setPlace = (leaderBoardArray[2], "third");
