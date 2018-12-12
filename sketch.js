@@ -699,25 +699,25 @@ setPlace = (playerStats, place) => {
 
 function onSignIn(googleUser) {
   googleProfile = googleUser.getBasicProfile();
-  console.log("ID: " + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  console.log("Name: " + profile.getName());
-  console.log("Image URL: " + profile.getImageUrl());
-  console.log("Email: " + profile.getEmail()); // This is null if the 'email' scope is not present.
+  console.log("ID: " + googleProfile.getId()); // Do not send to your backend! Use an ID token instead.
+  console.log("Name: " + googleProfile.getName());
+  console.log("Image URL: " + googleProfile.getImageUrl());
+  console.log("Email: " + googleProfile.getEmail()); // This is null if the 'email' scope is not present.
   if (users) {
-    if (users[profile.getId()]) {
-      hexagonProfile = users[profile.getId()];
-      hexagonProfile.id = profile.getId();
+    if (users[googleProfile.getId()]) {
+      hexagonProfile = users[googleProfile.getId()];
+      hexagonProfile.id = googleProfile.getId();
     } else {
       hexagonProfile = {
-        name: profile.getName(),
-        email: profile.getEmail(),
+        name: googleProfile.getName(),
+        email: googleProfile.getEmail(),
         highscore: { level: 0, difficulty: 0 }
       };
       firebase
         .database()
-        .ref("user/" + profile.getId())
+        .ref("user/" + googleProfile.getId())
         .set(hexagonProfile);
-      hexagonProfile.id = profile.getId();
+      hexagonProfile.id = googleProfile.getId();
     }
   }
 }
