@@ -90,6 +90,14 @@ firebase
 let hexagonMode = "flat";
 let gameOverBoolean = false;
 let hexagonProfile = null;
+let users = null;
+firebase
+  .database()
+  .ref()
+  .child("user")
+  .on("value", user => {
+    users = user.val();
+  });
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4);
@@ -677,29 +685,20 @@ function onSignIn(googleUser) {
   console.log("Name: " + profile.getName());
   console.log("Image URL: " + profile.getImageUrl());
   console.log("Email: " + profile.getEmail()); // This is null if the 'email' scope is not present.
-  let users = null;
-  firebase
-    .database()
-    .ref()
-    .child("user")
-    .on("value", user => {
-      users = user;
-    })
-    .then(value => {
-      if (users[profile.getId()]) {
-        hexagonProfile = users[profile.getId()];
-        hexagonProfile.id = profile.getId();
-      } else {
-        hexagonProfile = {
-          name: profile.getName(),
-          email: profile.getEmail(),
-          highscore: { level: 0, difficulty: 0 }
-        };
-        firebase
-          .database()
-          .ref("user/" + profile.getId())
-          .set(hexagonProfile);
-        hexagonProfile.id = profile.getId();
-      }
-    });
+
+  if (users[profile.getId()]) {
+    hexagonProfile = users[profile.getId()];
+    hexagonProfile.id = profile.getId();
+  } else {
+    hexagonProfile = {
+      name: profile.getName(),
+      email: profile.getEmail(),
+      highscore: { level: 0, difficulty: 0 }
+    };
+    firebase
+      .database()
+      .ref("user/" + profile.getId())
+      .set(hexagonProfile);
+    hexagonProfile.id = profile.getId();
+  }
 }
