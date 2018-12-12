@@ -671,11 +671,11 @@ gameOver = () => {
         }
       }
       console.log(leaderBoardArray);
-      setPlace = (leaderBoardArray[0], "first");
-      setPlace = (leaderBoardArray[1], "second");
-      setPlace = (leaderBoardArray[2], "third");
-      setPlace = (leaderBoardArray[3], "fourth");
-      setPlace = (leaderBoardArray[4], "fifth");
+      setPlace(leaderBoardArray[0], "first");
+      setPlace(leaderBoardArray[1], "second");
+      setPlace(leaderBoardArray[2], "third");
+      setPlace(leaderBoardArray[3], "fourth");
+      setPlace(leaderBoardArray[4], "fifth");
     }
   }
   if (confirm("GAME OVER! Want to play again?")) {
