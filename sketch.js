@@ -89,6 +89,7 @@ firebase
   });
 let hexagonMode = "flat";
 let gameOverBoolean = false;
+let hexagonProfile = null;
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 4);
@@ -290,6 +291,16 @@ function draw() {
       0,
       275
     );
+    if (hexagonProfile) {
+      text(
+        "Personal Highscore, Level: " +
+          hexagonProfile.highscore.level +
+          ", Difficulty: " +
+          hexagonProfile.highscore.difficulty,
+        0,
+        305
+      );
+    }
     text("(Score is difficulty x level)", 0, 305);
     text(hexagonMode, 230, 50);
   }
@@ -581,59 +592,69 @@ gameOver = () => {
     return null;
   }
   gameOverBoolean = true;
-  let score = (mapsize - 1) * difficultySlider.value();
-  let playerStats = {
-    level: mapsize - 1,
-    difficulty: difficultySlider.value()
-  };
-  let concurrentFirst = { ...firstPlace };
-  let concurrentSecond = { ...secondPlace };
-  let concurrentThird = { ...thirdPlace };
-  let concurrentFourth = { ...fourthPlace };
-  if (score > firstPlace.level * firstPlace.difficulty) {
-    playerStats.name = prompt(
-      "You seem to have beaten the #1 record, well done! Want to put your name on the leaderboard?:"
-    );
-    if (playerStats.name && playerStats.name != "") {
-      setPlace(concurrentFirst, "second");
-      setPlace(concurrentSecond, "third");
-      setPlace(concurrentThird, "fourth");
-      setPlace(concurrentFourth, "fifth");
-      setPlace(playerStats, "first");
-    }
-  } else if (score > secondPlace.level * secondPlace.difficulty) {
-    playerStats.name = prompt(
-      "You seem to have beaten the #2 record, well done! Want to put your name on the leaderboard?:"
-    );
-    if (playerStats.name && playerStats.name != "") {
-      setPlace(concurrentSecond, "third");
-      setPlace(concurrentThird, "fourth");
-      setPlace(concurrentFourth, "fifth");
-      setPlace(playerStats, "second");
-    }
-  } else if (score > thirdPlace.level * thirdPlace.difficulty) {
-    playerStats.name = prompt(
-      "You seem to have beaten the #3 record, well done! Want to put your name on the leaderboard?:"
-    );
-    if (playerStats.name && playerStats.name != "") {
-      setPlace(concurrentThird, "fourth");
-      setPlace(concurrentFourth, "fifth");
-      setPlace(playerStats, "third");
-    }
-  } else if (score > fourthPlace.level * fourthPlace.difficulty) {
-    playerStats.name = prompt(
-      "You seem to have beaten the #4 record, well done! Want to put your name on the leaderboard?:"
-    );
-    if (playerStats.name && playerStats.name != "") {
-      setPlace(concurrentFourth, "fifth");
-      setPlace(playerStats, "fourth");
-    }
-  } else if (score > fifthPlace.level * fifthPlace.difficulty) {
-    playerStats.name = prompt(
-      "You seem to have beaten the #5 record, well done! Want to put your name on the leaderboard?:"
-    );
-    if (playerStats.name && playerStats.name != "") {
-      setPlace(playerStats, "fifth");
+  if (hexagonProfile) {
+    let score = (mapsize - 1) * difficultySlider.value();
+    let playerStats = {
+      level: mapsize - 1,
+      difficulty: difficultySlider.value()
+    };
+    if (
+      score >
+      hexagonProfile.highscore.level * hexagonProfile.highscore.difficulty
+    ) {
+      alert("You seemed to have gotten a new personal best, good job!");
+      firebase
+        .database()
+        .ref("user/" + hexagonProfile.id + "/highscore")
+        .set(playerStats);
+      hexagonProfile.highscore = playerStats;
+      playerStats.name = hexagonProfile.name;
+      let concurrentFirst = { ...firstPlace };
+      let concurrentSecond = { ...secondPlace };
+      let concurrentThird = { ...thirdPlace };
+      let concurrentFourth = { ...fourthPlace };
+      let concurrentFifth = { ...fifthPlace };
+      let leaderBoardArray = [
+        concurrentFirst,
+        concurrentSecond,
+        concurrentThird,
+        concurrentFourth,
+        concurrentFifth,
+        playerStats
+      ];
+      leaderBoardArray
+        .sort(function(a, b) {
+          let scoreA = a.difficulty * a.level;
+          let scoreB = b.difficulty * b.level;
+          // Compare the 2 dates
+          if (scoreA < scoreB) return 1;
+          if (scoreA > scoreB) return -1;
+          return 0;
+        })
+        .then(val => {
+          for (
+            let lbaIndex = 0;
+            lbaIndex < leaderBoardArray.length;
+            lbaIndex++
+          ) {
+            const firstElement = leaderBoardArray[lbaIndex];
+            for (
+              let lbaInnerIndex = lbaIndex;
+              lbaInnerIndex < leaderBoardArray.length;
+              lbaInnerIndex++
+            ) {
+              const secondElement = leaderBoardArray[lbaInnerIndex];
+              if (firstElement.name === secondElement.name) {
+                leaderBoardArray.splice(lbaInnerIndex, 1);
+              }
+            }
+          }
+        });
+      setPlace = (leaderBoardArray[0], "first");
+      setPlace = (leaderBoardArray[1], "second");
+      setPlace = (leaderBoardArray[2], "third");
+      setPlace = (leaderBoardArray[3], "fourth");
+      setPlace = (leaderBoardArray[4], "fifth");
     }
   }
   if (confirm("GAME OVER! Want to play again?")) {
@@ -651,9 +672,34 @@ setPlace = (playerStats, place) => {
 };
 
 function onSignIn(googleUser) {
-  var profile = googleUser.getBasicProfile();
+  profile = googleUser.getBasicProfile();
   console.log("ID: " + profile.getId()); // Do not send to your backend! Use an ID token instead.
   console.log("Name: " + profile.getName());
   console.log("Image URL: " + profile.getImageUrl());
   console.log("Email: " + profile.getEmail()); // This is null if the 'email' scope is not present.
+  let users = null;
+  firebase
+    .database()
+    .ref()
+    .child("user")
+    .on("value", user => {
+      users = user;
+    })
+    .then(value => {
+      if (users[profile.getId()]) {
+        hexagonProfile = users[profile.getId()];
+        hexagonProfile.id = profile.getId();
+      } else {
+        hexagonProfile = {
+          name: profile.getName(),
+          email: profile.getEmail(),
+          highscore: { level: 0, difficulty: 0 }
+        };
+        firebase
+          .database()
+          .ref("user/" + profile.getId())
+          .set(hexagonProfile);
+        hexagonProfile.id = profile.getId();
+      }
+    });
 }
