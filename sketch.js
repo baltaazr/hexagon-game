@@ -660,7 +660,7 @@ gameOver = () => {
       for (let lbaIndex = 0; lbaIndex < leaderBoardArray.length; lbaIndex++) {
         const firstElement = leaderBoardArray[lbaIndex];
         for (
-          let lbaInnerIndex = lbaIndex;
+          let lbaInnerIndex = lbaIndex + 1;
           lbaInnerIndex < leaderBoardArray.length;
           lbaInnerIndex++
         ) {
