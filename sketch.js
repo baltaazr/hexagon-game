@@ -327,7 +327,7 @@ function draw() {
         305
       );
     }
-    text("(Score is difficulty x level)", 0, 305);
+    text("(Score is difficulty x level)", 0, 335);
     text(hexagonMode, 230, 50);
   }
 }
