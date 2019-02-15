@@ -40,9 +40,9 @@ singleHexagonGreedySearch = (problem, hexagon) => {
   return null;
 };
 
-let HEXSIZE = 25;
-let h = HEXSIZE * Math.sqrt(3);
-let w = HEXSIZE * 2;
+let hexsize = 25;
+let h = hexsize * Math.sqrt(3);
+let w = hexsize * 2;
 let mapsize = 5;
 let timeInterval = 5000;
 let start = false;
@@ -132,12 +132,12 @@ function setup() {
   hexagonModeButton.mouseClicked(() => {
     if (hexagonMode === "flat") {
       hexagonMode = "pointy";
-      w = HEXSIZE * Math.sqrt(3);
-      h = HEXSIZE * 2;
+      w = hexsize * Math.sqrt(3);
+      h = hexsize * 2;
     } else if (hexagonMode === "pointy") {
       hexagonMode = "flat";
-      h = HEXSIZE * Math.sqrt(3);
-      w = HEXSIZE * 2;
+      h = hexsize * Math.sqrt(3);
+      w = hexsize * 2;
     }
     console.log(w, h);
   });
@@ -174,9 +174,9 @@ function draw() {
         (mapsize - 1) * (3 / 4) * w > width / 2
       ) {
         console.log("SHRINK");
-        HEXSIZE = HEXSIZE * 0.9;
-        h = HEXSIZE * Math.sqrt(3);
-        w = HEXSIZE * 2;
+        hexsize = hexsize * 0.9;
+        h = hexsize * Math.sqrt(3);
+        w = hexsize * 2;
         drawMap();
       }
     } else if (hexagonMode === "pointy") {
@@ -185,9 +185,9 @@ function draw() {
         (mapsize - 1) * w > width / 2
       ) {
         console.log("SHRINK");
-        HEXSIZE = HEXSIZE * 0.9;
-        w = HEXSIZE * Math.sqrt(3);
-        h = HEXSIZE * 2;
+        hexsize = hexsize * 0.9;
+        w = hexsize * Math.sqrt(3);
+        h = hexsize * 2;
         drawMap();
       }
     }
@@ -200,7 +200,7 @@ function draw() {
             createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z)
           )
         );
-        polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
+        polygon(enemyCords.x, enemyCords.y, hexsize, 6);
       }
       push();
       fill(0, 255, 0);
@@ -209,7 +209,7 @@ function draw() {
           createVector(finish.cords.x, finish.cords.y, finish.cords.z)
         )
       );
-      polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
+      polygon(finishCords.x, finishCords.y, hexsize, 6);
       pop();
       push();
       fill(255, 0, 0);
@@ -221,7 +221,7 @@ function draw() {
             createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z)
           )
         );
-        polygon(enemyCords.x, enemyCords.y, HEXSIZE, 6);
+        polygon(enemyCords.x, enemyCords.y, hexsize, 6);
         if (p5.Vector.dist(enemy.cords, player.cords) === 0) {
           gameOver();
         }
@@ -391,7 +391,7 @@ function keyTyped() {
   let playerCords = offset_to_absolute(
     cube_to_offset(createVector(player.cords.x, player.cords.y, player.cords.z))
   );
-  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
+  polygon(playerCords.x, playerCords.y, hexsize, 6);
   let newCords = createVector(player.cords.x, player.cords.y, player.cords.z);
   if (hexagonMode === "flat") {
     if (key === "q") {
@@ -460,7 +460,7 @@ function keyTyped() {
   playerCords = offset_to_absolute(
     cube_to_offset(createVector(player.cords.x, player.cords.y, player.cords.z))
   );
-  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
+  polygon(playerCords.x, playerCords.y, hexsize, 6);
   pop();
   pop();
 }
@@ -480,8 +480,8 @@ generateRandomHex = n => {
   let x = 0;
   let y = 0;
   let z = 0;
-  let a = Math.floor(random(1, 7));
-  let b = Math.floor(random(1, n + 1));
+  let a = Math.floor(Math.random * 6 + 1);
+  let b = Math.floor(Math.random * n + 1);
   if (a === 1) {
     x = -n;
     y = b;
@@ -519,13 +519,13 @@ startGame = () => {
   gameOverBoolean = false;
   mapsize = 2;
   player.cords = createVector(0, 0, 0);
-  HEXSIZE = 25;
+  hexsize = 25;
   if (hexagonMode === "flat") {
-    h = HEXSIZE * Math.sqrt(3);
-    w = HEXSIZE * 2;
+    h = hexsize * Math.sqrt(3);
+    w = hexsize * 2;
   } else if (hexagonMode === "pointy") {
-    w = HEXSIZE * Math.sqrt(3);
-    h = HEXSIZE * 2;
+    w = hexsize * Math.sqrt(3);
+    h = hexsize * 2;
   }
   refreshMap();
   push();
@@ -585,21 +585,21 @@ drawMap = () => {
         createVector(mapHex.cords.x, mapHex.cords.y, mapHex.cords.z)
       )
     );
-    polygon(cords.x, cords.y, HEXSIZE, 6);
+    polygon(cords.x, cords.y, hexsize, 6);
   }
   push();
   fill(0, 255, 0);
   let finishCords = offset_to_absolute(
     cube_to_offset(createVector(finish.cords.x, finish.cords.y, finish.cords.z))
   );
-  polygon(finishCords.x, finishCords.y, HEXSIZE, 6);
+  polygon(finishCords.x, finishCords.y, hexsize, 6);
   pop();
   push();
   fill(0);
   let playerCords = offset_to_absolute(
     cube_to_offset(createVector(player.cords.x, player.cords.y, player.cords.z))
   );
-  polygon(playerCords.x, playerCords.y, HEXSIZE, 6);
+  polygon(playerCords.x, playerCords.y, hexsize, 6);
   pop();
   push();
   fill(255, 0, 0);
@@ -608,7 +608,7 @@ drawMap = () => {
     let cords = offset_to_absolute(
       cube_to_offset(createVector(enemy.cords.x, enemy.cords.y, enemy.cords.z))
     );
-    polygon(cords.x, cords.y, HEXSIZE, 6);
+    polygon(cords.x, cords.y, hexsize, 6);
   }
   pop();
 };
