@@ -480,8 +480,8 @@ generateRandomHex = n => {
   let x = 0;
   let y = 0;
   let z = 0;
-  let a = Math.floor(Math.random * 6 + 1);
-  let b = Math.floor(Math.random * n + 1);
+  let a = Math.floor(Math.random() * 6 + 1);
+  let b = Math.floor(Math.random() * n + 1);
   if (a === 1) {
     x = -n;
     y = b;
